@@ -29,6 +29,7 @@ import argparse
 import io
 import sys
 import cloud_client.transcribe_async as long_speech
+import cloud_client.beta_snippets as beta_snippets
 import cloud_client.save_result_bigquery as save_result_bigquery
 
 #1. 구글 스토리지의 파일 리스트
@@ -60,7 +61,7 @@ def execute():
 #파일 수 만큼 loop를 돌려 긴오디오 인식을 수행한다.  (메터 데이터 인식 제외)
 def excuteLongAudio():
     for (speech_num, file_gs_path) in files_gs_path:
-        for sample_rate_hertz in sample_rate_hertzs:
+        for (sample_rate_hertz_idx, sample_rate_hertz) in sample_rate_hertzs:
             print(' ============ start ', file_gs_path, ', ', sample_rate_hertz, ' ===============')
             tuple_result_msg = ()
             result_msg = ''
@@ -113,30 +114,31 @@ def executeMetaLongAudio():
     #MICROPHONE_DISTANCE_UNSPECIFIED : 오디오 유형을 알 수 없습니다.
     #NEARFIELD : 오디오는 밀접하게 배치 된 마이크에서 캡처했습니다 (전화, 마이크) 1미터이내
     #MIDFIELD : 스피커가 마이크에서 3 미터 이내
-    microphoneDistances = [(1, speech.enums.RecognitionMetadata.microphoneDistances.MICROPHONE_DISTANCE_UNSPECIFIED),
-                           (2, speech.enums.RecognitionMetadata.microphoneDistances.NEARFIELD),
-                           (3, speech.enums.RecognitionMetadata.microphoneDistances.MIDFIELD)]
+    microphoneDistances = [(1, speech.enums.RecognitionMetadata.MicrophoneDistance.MICROPHONE_DISTANCE_UNSPECIFIED),
+                           (2, speech.enums.RecognitionMetadata.MicrophoneDistance.NEARFIELD),
+                           (3, speech.enums.RecognitionMetadata.MicrophoneDistance.MIDFIELD)]
 
     # 오디오의 원본 오디오 또는 비디오 중 하나
     #ORIGINAL_MEDIA_TYPE_UNSPECIFIED : 알 수없는 원본 미디어 유형입니다.
     #AUDIO : 음성 데이터는 오디오 녹음입니다.
-    originalMediaTypes = [(1, speech.enums.RecognitionMetadata.originalMediaTypes.ORIGINAL_MEDIA_TYPE_UNSPECIFIED),
-                          (2, speech.enums.RecognitionMetadata.originalMediaTypes.AUDIO)]
+    originalMediaTypes = [(1, speech.enums.RecognitionMetadata.OriginalMediaType.ORIGINAL_MEDIA_TYPE_UNSPECIFIED),
+                          (2, speech.enums.RecognitionMetadata.OriginalMediaType.AUDIO)]
 
     # 오디오 캡쳐 장치 종류
     #RECORDING_DEVICE_TYPE_UNSPECIFIED : 녹음 장치를 알 수 없습니다.
     #SMARTPHONE : 음성은 스마트 폰에 녹음되었습니다.
     #PHONE_LINE : 연설은 전화선을 통해 기록되었습니다.
-    recordingDeviceTypes = [(1, speech.enums.RecognitionMetadata.recordingDeviceTypes.RECORDING_DEVICE_TYPE_UNSPECIFIED),
-                            (2, speech.enums.RecognitionMetadata.recordingDeviceTypes.SMARTPHONE),
-                            (3, speech.enums.RecognitionMetadata.recordingDeviceTypes.PHONE_LINE)]
+    recordingDeviceTypes = [(1, speech.enums.RecognitionMetadata.RecordingDeviceType.RECORDING_DEVICE_TYPE_UNSPECIFIED),
+                            (2, speech.enums.RecognitionMetadata.RecordingDeviceType.SMARTPHONE),
+                            (3, speech.enums.RecognitionMetadata.RecordingDeviceType.PHONE_LINE)]
     for (speech_num, file_gs_path) in files_gs_path:
-        for sample_rate_hertz in sample_rate_hertzs:
-            for interactionType in interactionTypes:
-                for industryNaicsCodeOfAudio in industryNaicsCodeOfAudios:
-                    for microphoneDistance in microphoneDistances:
-                        for originalMediaType in originalMediaTypes:
-                            for recordingDeviceType in recordingDeviceTypes:
+        for (sample_rate_hertz_idx, sample_rate_hertz) in sample_rate_hertzs:
+            for (interactionType_idx, interactionType) in interactionTypes:
+                for (industryNaicsCodeOfAudio_idx, industryNaicsCodeOfAudio) in industryNaicsCodeOfAudios:
+                    for (microphoneDistance_idx, microphoneDistance) in microphoneDistances:
+                        for (originalMediaType_idx, originalMediaType) in originalMediaTypes:
+                            for (recordingDeviceType_idx, recordingDeviceType) in recordingDeviceTypes:
+                                print('recordingDeviceType : ', recordingDeviceType)
                                 print(' ============ START file_gs_path :', file_gs_path,
                                       ', sample_rate_hertz : ', sample_rate_hertz,
                                       ', interactionType : ', interactionType,
@@ -152,7 +154,7 @@ def executeMetaLongAudio():
                                 stt_status = 1
                                 try:
                                     #2-2. 긴 오디오 파일 인식 결과 가져오기
-                                    tuple_result_msg = long_speech.transcribe_gcs_with_metadata_return(file_gs_path,                    #스토리지 uri
+                                    tuple_result_msg = beta_snippets.transcribe_gcs_with_metadata_return(file_gs_path,                    #스토리지 uri
                                                                                                         sample_rate_hertz,         #샘플비율 헤르츠
                                                                                                         interactionType,           #오디오 사용 사례
                                                                                                         industryNaicsCodeOfAudio,  #오디오 산업 카테고리
