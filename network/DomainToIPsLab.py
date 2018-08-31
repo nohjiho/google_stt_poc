@@ -34,6 +34,7 @@ def appendHashSet(ipAddr):
 # Google STT 인증 시 oauth2.googleapis.com 443 사용
 domain = 'oauth2.googleapis.com'
 
+
 for i in range(5000):
     ipAddr = getIpAddr(domain)
     print('ipAddr : ', ipAddr)

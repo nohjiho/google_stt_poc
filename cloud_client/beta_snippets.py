@@ -34,13 +34,9 @@ def transcribe_gcs_with_metadata(gcs_uri):
     """Send a request that includes recognition metadata."""
     # [START speech_transcribe_recognition_metadata_beta]
     from google.cloud import speech_v1p1beta1 as speech
-    from google.cloud.speech import enums
-    from google.cloud.speech import types
 
     client = speech.SpeechClient()
-
-    audio = types.RecognitionAudio(uri=gcs_uri)
-
+    audio = speech.types.RecognitionAudio(uri=gcs_uri)
 
     # Here we construct a recognition metadata object.
     # Most metadata fields are specified as enums that can be found
@@ -58,14 +54,12 @@ def transcribe_gcs_with_metadata(gcs_uri):
     # https://www.naics.com/search/
     metadata.industry_naics_code_of_audio = 519190
 
-    config = types.RecognitionConfig(
-        # encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
-        encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=8000,  # default : 16000
-        language_code='ko-KR',  # 한국어 : ko-KR
+    config = speech.types.RecognitionConfig(
+        encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=8000,
+        language_code='ko-KR',
         # Add this in the request to send metadata.
-        metadata=metadata
-    )
+        metadata=metadata)
 
     operation = client.long_running_recognize(config, audio)
 
@@ -78,7 +72,6 @@ def transcribe_gcs_with_metadata(gcs_uri):
         print('First alternative of result {}'.format(i))
         print('Transcript: {}'.format(alternative.transcript))
     # [END speech_transcribe_recognition_metadata_beta]
-
 
 def transcribe_file_with_metadata():
     """Send a request that includes recognition metadata."""
@@ -125,5 +118,6 @@ def transcribe_file_with_metadata():
     # [END speech_transcribe_recognition_metadata_beta]
 
 if __name__ == '__main__':
-    transcribe_file_with_metadata()
+    #transcribe_file_with_metadata()
+    transcribe_gcs_with_metadata('gs://dlab_ml/speech/ref/샘플_4_개인정보삭제.wav')
 
