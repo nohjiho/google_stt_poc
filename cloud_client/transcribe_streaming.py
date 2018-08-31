@@ -31,12 +31,14 @@ def transcribe_streaming(stream_file):
     from google.cloud import speech
     from google.cloud.speech import enums
     from google.cloud.speech import types
+
     client = speech.SpeechClient()
 
     # [START speech_python_migration_streaming_request]
     with io.open(stream_file, 'rb') as audio_file:
         content = audio_file.read()
 
+    print('content : ', content)
     # In practice, stream should be a generator yielding chunks of audio data.
     stream = [content]
     requests = (types.StreamingRecognizeRequest(audio_content=chunk)
@@ -53,6 +55,7 @@ def transcribe_streaming(stream_file):
     # [START speech_python_migration_streaming_response]
     responses = client.streaming_recognize(streaming_config, requests)
     # [END speech_python_migration_streaming_request]
+    print('responses : ', responses)
 
     for response in responses:
         # Once the transcription has settled, the first result will contain the
