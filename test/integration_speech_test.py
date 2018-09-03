@@ -45,10 +45,7 @@ files_gs_path = [(1,'gs://dlab_ml/speech/ref/샘플_1_개인정보삭제.wav', '
              (9, 'gs://dlab_ml/speech/ref/샘플_9_개인정보삭제.wav', '2:20'),
              (10, 'gs://dlab_ml/speech/ref/샘플_10_개인정보삭제.wav', '2:11')]
 
-# 샘플비율 헤르츠
-sample_rate_hertzs = [(1, 6000),
-                      (2, 8000),
-                      (3, 10000)]
+sample_rate_hertz = 8000
 
 # [START execute]
 def execute():
@@ -62,48 +59,47 @@ def execute():
 #파일 수 만큼 loop를 돌려 긴오디오 인식을 수행한다.  (메터 데이터 인식 제외)
 def excuteLongAudio():
     for (speech_num, file_gs_path, stream_time) in files_gs_path:
-        for (sample_rate_hertz_idx, sample_rate_hertz) in sample_rate_hertzs:
-            print(' ============ start ', file_gs_path, ', ', sample_rate_hertz, ' ===============')
-            tuple_result_msg = ()
-            result_msg = ''
-            except_msg = ''
-            confidence = 0
-            stt_status = 1
-            latency = 0
+        print(' ============ start ', file_gs_path, ', ', sample_rate_hertz, ' ===============')
+        tuple_result_msg = ()
+        result_msg = ''
+        except_msg = ''
+        confidence = 0
+        stt_status = 1
+        latency = 0
+        try:
+            start_time = time.time()
+            print('start_time : ', start_time)
+
+            # 2-2. 긴 오디오 파일 인식 결과 가져오기
+            tuple_result_msg = long_speech.transcribe_gcs_return(file_gs_path)
+
+            end_time = time.time()
+            latency = end_time - start_time
+            print('end_time : ', end_time)
+            print('latency : ', latency)
+            result_msg = tuple_result_msg[0]
+            confidence = tuple_result_msg[1]
+        except:
+            stt_status = -1
+            #오류가 발생하면 except_msg 변수에 담는다.
+            except_msg = sys.exc_info()
+            print("Unexpected error:", except_msg)
+            #오류 무시
+            pass
+        finally:
+            print('result_msg : ', result_msg)
+            #2-3.빅쿼리에 결과 저장
             try:
-                start_time = time.time()
-                print('start_time : ', start_time)
-
-                # 2-2. 긴 오디오 파일 인식 결과 가져오기
-                tuple_result_msg = long_speech.transcribe_gcs_return(file_gs_path)
-
-                end_time = time.time()
-                latency = end_time - start_time
-                print('end_time : ', end_time)
-                print('latency : ', latency)
-                result_msg = tuple_result_msg[0]
-                confidence = tuple_result_msg[1]
+                save_result_bigquery.saveBigQuery(speech_num, '2', stt_status, except_msg, result_msg,
+                                                  sample_rate_hertz, '', False, '', '',
+                                                  '', '', '', 0, stream_time,
+                                                  confidence, latency)
             except:
-                stt_status = -1
-                #오류가 발생하면 except_msg 변수에 담는다.
                 except_msg = sys.exc_info()
                 print("Unexpected error:", except_msg)
-                #오류 무시
                 pass
-            finally:
-                print('result_msg : ', result_msg)
-                #2-3.빅쿼리에 결과 저장
-                try:
-                    save_result_bigquery.saveBigQuery(speech_num, '2', stt_status, except_msg, result_msg,
-                                                      sample_rate_hertz, '', False, '', '',
-                                                      '', '', '', 0, stream_time,
-                                                      confidence, latency)
-                except:
-                    except_msg = sys.exc_info()
-                    print("Unexpected error:", except_msg)
-                    pass
 
-                print(' ============ end ', file_gs_path, ', ', sample_rate_hertz, ' ===============')
+            print(' ============ end ', file_gs_path, ', ', sample_rate_hertz, ' ===============')
 
 def executeMetaLongAudio():
     from google.cloud import speech_v1p1beta1 as speech
@@ -143,14 +139,66 @@ def executeMetaLongAudio():
                             (3, speech.enums.RecognitionMetadata.RecordingDeviceType.PHONE_LINE)]
 
     for (speech_num, file_gs_path, stream_time) in files_gs_path:
-        for (sample_rate_hertz_idx, sample_rate_hertz) in sample_rate_hertzs:
-            for (interactionType_idx, interactionType) in interactionTypes:
-                for (industryNaicsCodeOfAudio_idx, industryNaicsCodeOfAudio) in industryNaicsCodeOfAudios:
-                    for (microphoneDistance_idx, microphoneDistance) in microphoneDistances:
-                        for (originalMediaType_idx, originalMediaType) in originalMediaTypes:
-                            for (recordingDeviceType_idx, recordingDeviceType) in recordingDeviceTypes:
-                                print('recordingDeviceType : ', recordingDeviceType)
-                                print(' ============ START file_gs_path :', file_gs_path,
+        for (interactionType_idx, interactionType) in interactionTypes:
+            for (industryNaicsCodeOfAudio_idx, industryNaicsCodeOfAudio) in industryNaicsCodeOfAudios:
+                for (microphoneDistance_idx, microphoneDistance) in microphoneDistances:
+                    for (originalMediaType_idx, originalMediaType) in originalMediaTypes:
+                        for (recordingDeviceType_idx, recordingDeviceType) in recordingDeviceTypes:
+                            print(' ============ START file_gs_path :', file_gs_path,
+                                  ', sample_rate_hertz : ', sample_rate_hertz,
+                                  ', interactionType : ', interactionType,
+                                  ', industryNaicsCodeOfAudio : ', industryNaicsCodeOfAudio,
+                                  ', microphoneDistance : ', microphoneDistance,
+                                  ', originalMediaType : ', originalMediaType,
+                                  ', recordingDeviceType : ', recordingDeviceType,
+                                  ' ===============')
+                            tuple_result_msg = ()
+                            result_msg = ''
+                            except_msg = ''
+                            confidence = 0
+                            stt_status = 1
+                            latency = 0
+                            try:
+                                start_time = time.time()
+                                print('start_time : ', start_time)
+
+                                # 2-2. 긴 오디오 파일 인식 결과 가져오기
+                                tuple_result_msg = beta_snippets.transcribe_gcs_with_metadata_return(file_gs_path,             #스토리지 uri
+                                                                                                    sample_rate_hertz,         #샘플비율 헤르츠
+                                                                                                    interactionType,           #오디오 사용 사례
+                                                                                                    industryNaicsCodeOfAudio,  #오디오 산업 카테고리
+                                                                                                    microphoneDistance,        #스피커에서 마이크 까지의 거리
+                                                                                                    originalMediaType,         #오디오의 원본 오디오 또는 비디오 중 하나
+                                                                                                    recordingDeviceType)
+
+                                end_time = time.time()
+                                latency = end_time - start_time
+                                print('end_time : ', end_time)
+                                print('latency : ', latency)
+
+                                result_msg = tuple_result_msg[0]
+                                confidence = tuple_result_msg[1]
+                            except:
+                                stt_status = -1
+                                #오류가 발생하면 except_msg 변수에 담는다.
+                                except_msg = sys.exc_info()
+                                print("Unexpected error:", except_msg)
+                                #오류 무시
+                                pass
+                            finally:
+                                print('result_msg : ', result_msg)
+                                #2-3.빅쿼리에 결과 저장
+                                try:
+                                    save_result_bigquery.saveBigQuery(speech_num, '2', stt_status, except_msg, result_msg,
+                                                                      sample_rate_hertz, '', False, interactionType, industryNaicsCodeOfAudio,
+                                                                      microphoneDistance, originalMediaType, recordingDeviceType, 0, stream_time,
+                                                                      confidence, latency)
+                                except:
+                                    except_msg = sys.exc_info()
+                                    print("Unexpected error:", except_msg)
+                                    pass
+
+                                print(' ============ END file_gs_path :', file_gs_path,
                                       ', sample_rate_hertz : ', sample_rate_hertz,
                                       ', interactionType : ', interactionType,
                                       ', industryNaicsCodeOfAudio : ', industryNaicsCodeOfAudio,
@@ -158,60 +206,6 @@ def executeMetaLongAudio():
                                       ', originalMediaType : ', originalMediaType,
                                       ', recordingDeviceType : ', recordingDeviceType,
                                       ' ===============')
-                                tuple_result_msg = ()
-                                result_msg = ''
-                                except_msg = ''
-                                confidence = 0
-                                stt_status = 1
-                                latency = 0
-                                try:
-                                    start_time = time.time()
-                                    print('start_time : ', start_time)
-
-                                    # 2-2. 긴 오디오 파일 인식 결과 가져오기
-                                    tuple_result_msg = beta_snippets.transcribe_gcs_with_metadata_return(file_gs_path,                    #스토리지 uri
-                                                                                                        sample_rate_hertz,         #샘플비율 헤르츠
-                                                                                                        interactionType,           #오디오 사용 사례
-                                                                                                        industryNaicsCodeOfAudio,  #오디오 산업 카테고리
-                                                                                                        microphoneDistance,        #스피커에서 마이크 까지의 거리
-                                                                                                        originalMediaType,         #오디오의 원본 오디오 또는 비디오 중 하나
-                                                                                                        recordingDeviceType)
-
-                                    end_time = time.time()
-                                    latency = end_time - start_time
-                                    print('end_time : ', end_time)
-                                    print('latency : ', latency)
-
-                                    result_msg = tuple_result_msg[0]
-                                    confidence = tuple_result_msg[1]
-                                except:
-                                    stt_status = -1
-                                    #오류가 발생하면 except_msg 변수에 담는다.
-                                    except_msg = sys.exc_info()
-                                    print("Unexpected error:", except_msg)
-                                    #오류 무시
-                                    pass
-                                finally:
-                                    print('result_msg : ', result_msg)
-                                    #2-3.빅쿼리에 결과 저장
-                                    try:
-                                        save_result_bigquery.saveBigQuery(speech_num, '2', stt_status, except_msg, result_msg,
-                                                                          sample_rate_hertz, '', False, interactionType, industryNaicsCodeOfAudio,
-                                                                          microphoneDistance, originalMediaType, recordingDeviceType, 0, stream_time,
-                                                                          confidence, latency)
-                                    except:
-                                        except_msg = sys.exc_info()
-                                        print("Unexpected error:", except_msg)
-                                        pass
-
-                                    print(' ============ END file_gs_path :', file_gs_path,
-                                          ', sample_rate_hertz : ', sample_rate_hertz,
-                                          ', interactionType : ', interactionType,
-                                          ', industryNaicsCodeOfAudio : ', industryNaicsCodeOfAudio,
-                                          ', microphoneDistance : ', microphoneDistance,
-                                          ', originalMediaType : ', originalMediaType,
-                                          ', recordingDeviceType : ', recordingDeviceType,
-                                          ' ===============')
 
 if __name__ == '__main__':
     execute()
