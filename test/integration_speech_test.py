@@ -98,11 +98,11 @@ def excuteLongAudio():
                 except_msg = sys.exc_info()
                 print("Unexpected error:", except_msg)
                 pass
-
-            print(' ============ end ', file_gs_path, ', ', sample_rate_hertz, ' ===============')
+            finally:
+                print(' ============ end ', file_gs_path, ', ', sample_rate_hertz, ' ===============')
 
 def executeMetaLongAudio():
-    from google.cloud import speech_v1p1beta1 as speech
+    import google.cloud.speech_v1p1beta1 as speech
     # 오디오 사용 사례
     #INTERACTION_TYPE_UNSPECIFIED : 사용 사례가 알려지지 않았거나 아래의 다른 값 중 하나 이외의 값
     #DISCUSSION : 대화  또는 토론에 참여한 여러 사람
@@ -193,6 +193,7 @@ def executeMetaLongAudio():
                                                                       sample_rate_hertz, '', False, interactionType, industryNaicsCodeOfAudio,
                                                                       microphoneDistance, originalMediaType, recordingDeviceType, 0, stream_time,
                                                                       confidence, latency)
+
                                 except:
                                     except_msg = sys.exc_info()
                                     print("Unexpected error:", except_msg)
@@ -205,6 +206,7 @@ def executeMetaLongAudio():
                                       ', microphoneDistance : ', microphoneDistance,
                                       ', originalMediaType : ', originalMediaType,
                                       ', recordingDeviceType : ', recordingDeviceType,
+                                      ', latency : ', latency,
                                       ' ===============')
 
 if __name__ == '__main__':
