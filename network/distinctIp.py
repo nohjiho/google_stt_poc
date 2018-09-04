@@ -66,7 +66,7 @@ def appendHashSet(ipAddr):
     if (ipAddr in ip_hashset) == False:
         ip_hashset.add(ipAddr)
         print(ipAddr)
-        #print('ip_hashset : ', ip_hashset)
+        print('ip_hashset : ', ip_hashset)
 
 for ip in ip_list:
     appendHashSet(ip)
