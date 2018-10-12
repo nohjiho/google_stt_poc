@@ -35,15 +35,19 @@ import cloud_client.save_result_bigquery as save_result_bigquery
 
 #1. 구글 스토리지의 파일 리스트
 files_gs_path = [(1,'gs://dlab_ml/speech/ref/샘플_1_개인정보삭제.wav', '2:04'),
-             (2, 'gs://dlab_ml/speech/ref/샘플_2_개인정보삭제.wav', '1:49'),
-             (3, 'gs://dlab_ml/speech/ref/샘플_3_개인정보삭제.wav', '1:29'),
-             (4, 'gs://dlab_ml/speech/ref/샘플_4_개인정보삭제.wav', '0.51'),
-             (5, 'gs://dlab_ml/speech/ref/샘플_5_개인정보삭제.wav', '1:42'),
-             (6, 'gs://dlab_ml/speech/ref/샘플_6_개인정보삭제.wav', '1:52'),
-             (7, 'gs://dlab_ml/speech/ref/샘플_7_개인정보삭제.wav', '1:02'),
-             (8, 'gs://dlab_ml/speech/ref/샘플_8_개인정보삭제.wav', '1:35'),
-             (9, 'gs://dlab_ml/speech/ref/샘플_9_개인정보삭제.wav', '2:20'),
-             (10, 'gs://dlab_ml/speech/ref/샘플_10_개인정보삭제.wav', '2:11')]
+            (2, 'gs://dlab_ml/speech/ref/샘플_2_개인정보삭제.wav', '1:49'),
+            (3, 'gs://dlab_ml/speech/ref/샘플_3_개인정보삭제.wav', '1:29'),
+            (4, 'gs://dlab_ml/speech/ref/샘플_4_개인정보삭제.wav', '0.51'),
+            (5, 'gs://dlab_ml/speech/ref/샘플_5_개인정보삭제.wav', '1:42'),
+            (6, 'gs://dlab_ml/speech/ref/샘플_6_개인정보삭제.wav', '1:52'),
+            (7, 'gs://dlab_ml/speech/ref/샘플_7_개인정보삭제.wav', '1:02'),
+            (8, 'gs://dlab_ml/speech/ref/샘플_8_개인정보삭제.wav', '1:35'),
+            (9, 'gs://dlab_ml/speech/ref/샘플_9_개인정보삭제.wav', '2:20'),
+            (10, 'gs://dlab_ml/speech/ref/샘플_10_개인정보삭제.wav', '2:11'),
+            (11, 'gs://dlab_ml/speech/ref/샘플_11_개인정보삭제.wav', '2:30'),
+            (12, 'gs://dlab_ml/speech/ref/샘플_12_개인정보삭제.wav', '2:36'),
+            (13, 'gs://dlab_ml/speech/ref/샘플_13_개인정보삭제.wav', '2:20'),
+            (14, 'gs://dlab_ml/speech/ref/샘플_14_개인정보삭제.wav', '2:04')]
 
 sample_rate_hertz = 8000
 
@@ -109,7 +113,8 @@ def executeMetaLongAudio():
     #PRESENTATION : 하나 또는 그 이상의 사람들이 강의
     interactionTypes = [(1, speech.enums.RecognitionMetadata.InteractionType.INTERACTION_TYPE_UNSPECIFIED),
                         (2, speech.enums.RecognitionMetadata.InteractionType.DISCUSSION),
-                        (3, speech.enums.RecognitionMetadata.InteractionType.PRESENTATION)]
+                        (3, speech.enums.RecognitionMetadata.InteractionType.PRESENTATION),
+                        (4, speech.enums.RecognitionMetadata.InteractionType.PHONE_CALL)]
     # 오디오 산업 카테고리
     #522291 : 소비자 금융 회사 (즉, 무담보 현금 대출)
     #522220 : 자동차 금융리스 기업
