@@ -1,6 +1,11 @@
+"""
+install package
+easy_install --upgrade google-cloud-bigquery
+easy_install --upgrade dialogflow
+"""
+
 import uuid
 #import dialogflow_v2 as dialogflow
-#
 import dialogflow_v2beta1 as dialogflow
 # Imports the Google Cloud client library
 import chatbot.test.saveResultInfoBigQuery as save_result_bigquery
@@ -69,7 +74,8 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
 
 if __name__ == '__main__':
     # local file path
-    file_path = 'C:/Users/웰컴저축은행/workspace/google_stt_poc/chatbot/test/testfile/'
+    #file_path = 'C:/Users/웰컴저축은행/workspace/google_stt_poc/chatbot/test/test_file/'
+    file_path = 'C:/df/testfile/'
     # server file path
     #file_path = '/home/welcomesbdlab/google_stt_poc/chatbot/test/test_file/'
     file_name_list = ['테스트케이스1.txt','테스트케이스2.txt', '테스트케이스3.txt', '테스트케이스4.txt']
@@ -84,7 +90,8 @@ if __name__ == '__main__':
         with open(file_full_path) as f:
             lines = f.readlines()
 
-            return_list = detect_intent_texts('ml-lab-207601', uuid, lines, 'ko-KR')
+            print('uuid : ', uuid.UUID)
+            return_list = detect_intent_texts('ml-lab-207601', uuid.UUID, lines, 'ko-KR')
 
             #응답 메시지에서 주요한 정보들을 BigQuery에 저장.
             print(len(return_list))
