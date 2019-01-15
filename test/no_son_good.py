@@ -34,17 +34,19 @@ import cloud_client.beta_snippets as beta_snippets
 import cloud_client.save_result_bigquery as save_result_bigquery
 
 #1. 구글 스토리지의 파일 리스트
-files_gs_path = [(11, 'gs://dlab_ml/speech/ref/샘플_11_개인정보삭제.m4a', '2:30')]
+files_gs_path = [(11, 'gs://dlab_ml/speech/ref/샘플_11_개인정보삭제.wav', '2:30')]
 
-sample_rate_hertz = 8000
+sample_rate_hertz = 44100 #8000
 
 # [START execute]
 def execute():
     # 2. 파일 수 만큼 loop를 돌려 긴오디오 인식을 수행한다.  (메터 데이터 인식 제외)
     excuteLongAudio()
 
+    print('files_gs_path : ', files_gs_path)
+
     #3. 파일 수 만큼 loop를 돌려 긴오디오 인식을 수행한다.(메터 데이터 설정 인식)
-    executeMetaLongAudio()
+    #executeMetaLongAudio()
 # [END execute]
 
 #파일 수 만큼 loop를 돌려 긴오디오 인식을 수행한다.  (메터 데이터 인식 제외)

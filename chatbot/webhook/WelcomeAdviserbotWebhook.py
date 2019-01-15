@@ -1,18 +1,22 @@
 # -*- coding : utf-8 -*-
-#easy_install --upgrade Flask
+# easy_install --upgrade Flask
 from flask import Flask, request, make_response, jsonify
 import requests as requests
 import json as json
+import sys
+import uuid
 
 ERROR_MESSAGE = '오류메시지'
 
 app = Flask(__name__)
 
-#웹훅 펑션
-@app.route('/', methods=['POST'])
+
+# 웹훅 펑션
+@app.route('/', methods=['GET', 'POST'])
+# @app.route('/')
 def webhook():
-    #return "Hello Webhook"
-    #on_json_loading_failed() 재정의(json parsing 오류처리)
+    # return "Hello Webhook"
+    # on_json_loading_failed() 재정의(json parsing 오류처리)
     request.on_json_loading_failed = on_json_loading_failed_return_dict
 
     # 액션 구함
@@ -22,7 +26,7 @@ def webhook():
     print('req : ', req)
     print('action : ', action)
 
-    #액션 처리
+    # 액션 처리
     if action == 'category_info':
         category_name = req['result']['parameters']['category_type']
         print('category_name : ', category_name)
@@ -30,75 +34,153 @@ def webhook():
     else:
         answer = '액션 없음. error'
 
-    res = {'speech' :  answer}
+    res = {'speech': answer}
     return jsonify(res)
 
-#키보드 처리
-@app.route('/keyboard', methods=['POST'])
+
+@app.route('/friend/test')
+def friend_test():
+    print('=== friend_test ===')
+
+
+@app.route('/chat_room/test')
+def chat_room_test():
+    print('=== chat room test ===')
+
+
+# 키보드 처리
+# @app.route('/keyboard')
+@app.route('/keyboard', methods=['GET', 'POST'])
 def keyboard():
     res = {
-        'type' : 'buttons' ,
-        'buttons' : ['대화하기']
+        'type': 'buttons',
+        'buttons': ['대화하기']
     }
     return jsonify(res)
 
-#메시지 처리
+
+# 메시지 처리
 @app.route('/message', methods=['POST'])
 def message():
-    # on_json_loading_failed() 재정의(json parsing 오류처리)
-    request.on_json_loading_failed = on_json_loading_failed_return_dict
-    #메시지 받기
-    req = request.get_json()
-    user_key = req['user_key']
-    content = req['content']
+    print('start message!!')
+    try:
+        # on_json_loading_failed() 재정의(json parsing 오류처리)
+        request.on_json_loading_failed = on_json_loading_failed_return_dict
 
-    if len(user_key) > 1 or len(content) > 1:
-        answer = ERROR_MESSAGE
+        print('request.get_json() : ', request.get_json())
+        # 메시지 받기
+        req = request.get_json()
+        user_key = req['user_key']
+        content = req['content']
 
-    #답변 구함
-    answer = get_answer(content, user_key)
+        print('req : ', req)
+        print('user_key : ', user_key)
+        print('content : ', content)
 
-    #메시지 설정
-    res = {
-        'message' : {'text' : answer}
-    }
+        if len(user_key) < 1 or len(content) < 1:
+            answer = ERROR_MESSAGE
 
-    return jsonify(res)
+        # 답변 구함 api version v1
+        # answer = get_answer(content, user_key)
 
-#답변 함수
-def get_answer(text, user_key):
-    #Dialogflow에 요청
-    data_send = {
-        'lang' : 'ko' ,
-        'query' : text,
-        'sessionId' : user_key ,
-        'timezone' : 'Asia/Seoul'
-    }
+        # 답변 구함 api version v2
+        answer = get_answer_v2(content, user_key)
 
-    data_header = {
-        'Content-Type' : 'application/json; charset=utf-8' ,
-        'Authorization' : '9b59af7a02854c7788524b3ed798bad3' # Client access Token
-    }
+        # answer_message = "\\n".join(answer.splitlines())
+        answer_intent_name = answer[0]
+        answer_message = answer[1].replace('| ', '\n')
+        # answer_message = answer[1]
 
-    dialogflow_url = 'https://api.dialogflow.com/v1/query?v=20181012'
+        print('intent_name : ', answer_intent_name)
+        print('answer_message : ', answer_message)
 
-    res = requests.post(dialogflow_url ,
-                        data=json.dumps(data_send) ,
-                        headers=data_header)
+        print('find : ', answer_message[1].find('대출신청 진행을 위해 약관 동의를 해주세요.'))
+        # 메시지 설정
+        if answer_intent_name == 'Default Welcome Intent':
+            res = {
+                'message': {
+                    'text': answer_message,
+                    'photo': {
+                        'url': 'http://35.200.52.162:5110/static/intro.jpg',
+                        'width': 640,
+                        'height': 480
+                    }
+                }
+            }
+        else:
+            res = {
+                'message': {'text': answer_message}
+            }
+        print('res : ', res)
+    except:
+        except_msg = sys.exc_info()
+        print("Unexpected error:", except_msg)
 
-    #대답처리
-    if res.status_code != requests.codes.ok:
-        return ERROR_MESSAGE
+    jsonify_res = jsonify(res)
 
-    data_receive = res.json()
-    answer = data_receive['result']['fulfillment']['speech']
+    print('jsonify_res : ', jsonify_res)
 
-    return answer
+    return jsonify_res
 
-#오류처리 함수
+
+def get_answer_v2(text, user_key):
+    session_id = str(uuid.uuid4())
+    project_id = 'ml-lab-207601'
+    language_code = 'ko'
+
+    result_text = ''
+
+    print('text', text)
+    print('user_key', user_key)
+
+    # easy_install --upgrade dialogflow
+    import dialogflow_v2 as dialogflow
+    session_client = dialogflow.SessionsClient()
+
+    session = session_client.session_path(project_id, session_id)
+    print('Session path: {}\n'.format(session))
+
+    text_input = dialogflow.types.TextInput(
+        text=text, language_code=language_code)
+
+    print('text_input', text_input)
+
+    query_input = dialogflow.types.QueryInput(text=text_input)
+
+    print('query_input', query_input)
+
+    response = session_client.detect_intent(
+        session=session, query_input=query_input)
+
+    print('response', response)
+
+    print('=' * 20)
+    print('Query text: {}'.format(response.query_result.query_text))
+    print('Detected intent: {} (confidence: {})\n'.format(
+        response.query_result.intent.display_name,
+        response.query_result.intent_detection_confidence))
+    print('Fulfillment text: {}\n'.format(
+        response.query_result.fulfillment_text))
+
+    result_text = response.query_result.fulfillment_text
+    query_text = response.query_result.query_text
+    intent_name = response.query_result.intent.display_name
+
+    print('response : ', response)
+    print('query_text : ', query_text)
+    print('result_text : ', result_text)
+    print('intent_name : ', intent_name)
+
+    result_arr = [intent_name, result_text]
+
+    return result_arr
+
+
+# 오류처리 함수
 def on_json_loading_failed_return_dict(e):
     print('on_json_loading_failed_return_dict : ', e)
     return {}
+
 
 def process_catetory_info(category_name):
     if category_name == u'홈페이지/앱이용':
@@ -133,4 +215,4 @@ def process_catetory_info(category_name):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5110, threaded=True)
+    app.run(host='0.0.0.0', port=5110, threaded=True)  # 5110

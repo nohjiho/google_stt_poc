@@ -34,23 +34,19 @@ import cloud_client.beta_snippets as beta_snippets
 import cloud_client.save_result_bigquery as save_result_bigquery
 
 #1. 구글 스토리지의 파일 리스트
-files_gs_path = [(1,'gs://dlab_ml/speech/ref/샘플_1_개인정보삭제.wav', '2:04'),
-             (2, 'gs://dlab_ml/speech/ref/샘플_2_개인정보삭제.wav', '1:49'),
-             (3, 'gs://dlab_ml/speech/ref/샘플_3_개인정보삭제.wav', '1:29'),
-             (4, 'gs://dlab_ml/speech/ref/샘플_4_개인정보삭제.wav', '0.51'),
-             (5, 'gs://dlab_ml/speech/ref/샘플_5_개인정보삭제.wav', '1:42'),
-             (6, 'gs://dlab_ml/speech/ref/샘플_6_개인정보삭제.wav', '1:52'),
-             (7, 'gs://dlab_ml/speech/ref/샘플_7_개인정보삭제.wav', '1:02'),
-             (8, 'gs://dlab_ml/speech/ref/샘플_8_개인정보삭제.wav', '1:35'),
-             (9, 'gs://dlab_ml/speech/ref/샘플_9_개인정보삭제.wav', '2:20'),
-             (10, 'gs://dlab_ml/speech/ref/샘플_10_개인정보삭제.wav', '2:11')]
+files_gs_path = [(12, 'gs://dlab_ml/speech/ref/샘플_12_개인정보삭제.wav', '2:36'),
+        (13, 'gs://dlab_ml/speech/ref/샘플_13_개인정보삭제.wav', '2:20'),
+        (14, 'gs://dlab_ml/speech/ref/샘플_14_개인정보삭제.wav', '2:04')
+        ]
 
-sample_rate_hertz = 8000
+sample_rate_hertz = 44100 #8000
 
 # [START execute]
 def execute():
     # 2. 파일 수 만큼 loop를 돌려 긴오디오 인식을 수행한다.  (메터 데이터 인식 제외)
-    excuteLongAudio()
+    #excuteLongAudio()
+
+    print('files_gs_path : ', files_gs_path)
 
     #3. 파일 수 만큼 loop를 돌려 긴오디오 인식을 수행한다.(메터 데이터 설정 인식)
     executeMetaLongAudio()
