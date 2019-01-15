@@ -64,8 +64,6 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
         print('result_msg : ', result_msg)
         print('sentiment_score : ', sentiment_score)
 
-
-    #BigQuery에 저장한 정보를 list형 변수에 담아 return
     return return_list
 
 if __name__ == '__main__':
