@@ -102,8 +102,12 @@ if __name__ == '__main__':
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
         'path', help='File or GCS path for audio file to be recognized')
-    args = parser.parse_args()
-    if args.path.startswith('gs://'):
-        transcribe_gcs(args.path)
+    gs_path = 'gs://dlab_ml/speech/ref/샘플_3_개인정보삭제.wav'
+    tuple_result_msg = long_speech.transcribe_gcs_return(gs_path)
+
+    ##args = parser.parse_args()
+    if gs_path.startswith('gs://'):
+        transcribe_gcs(gs_path)
+
     else:
         transcribe_file(args.path)
