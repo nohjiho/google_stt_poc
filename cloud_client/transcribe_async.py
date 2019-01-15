@@ -28,6 +28,7 @@ Example usage:
 #gs://dlab_ml/speech/ref/샘플1_1분.wav
 import argparse
 import io
+import sys
 
 
 # [START speech_transcribe_async]
@@ -77,7 +78,8 @@ def transcribe_gcs(gcs_uri):
     config = types.RecognitionConfig(
         # encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
         encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=8000,  # default : 16000
+        #sample_rate_hertz=8000,  # default : 16000
+        sample_rate_hertz=44100,  # default : 16000
         language_code='ko-KR'  # 한국어 : ko-KR
     )
 
@@ -88,6 +90,7 @@ def transcribe_gcs(gcs_uri):
 
     # Each result is for a consecutive portion of the audio. Iterate through
     # them to get the transcripts for the entire audio file.
+    print('response : ' , response)
     for result in response.results:
         # The first alternative is the most likely one for this portion.
         print(u'Transcript: {}'.format(result.alternatives[0].transcript))
@@ -143,8 +146,12 @@ if __name__ == '__main__':
     parser.add_argument(
         'path', help='File or GCS path for audio file to be recognized')
     args = parser.parse_args()
-    if args.path.startswith('gs://'):
-        transcribe_gcs(args.path)
-        #transcribe_gcs_return(gcs_uri)
-    else:
-        transcribe_file(args.path)
+    try:
+        if args.path.startswith('gs://'):
+            transcribe_gcs(args.path)
+            #transcribe_gcs_return(gcs_uri)
+        else:
+            transcribe_file(args.path)
+    except:
+        except_msg = sys.exc_info()
+        print('except : ', except_msg)

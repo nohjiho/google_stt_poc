@@ -54,6 +54,8 @@ def transcribe_gcs_with_metadata_return(gcs_uri,                    #스토리�
     metadata.industry_naics_code_of_audio = industryNaicsCodeOfAudios  #default : 519190
     metadata.recording_device_type = recordingDeviceTypes
     metadata.microphone_distance = microphoneDistances
+    #append meta start
+    #append meta end
     # Some metadata fields are free form strings
     metadata.recording_device_name = "Pixel 2 XL"
 
