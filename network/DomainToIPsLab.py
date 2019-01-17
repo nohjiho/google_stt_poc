@@ -27,6 +27,7 @@ def appendHashSet(ipAddr):
 # ssh.cloud.google.com
 # google.com
 domain = 'ssh.cloud.google.com' # ip_hashset :  {'', '216.58.197.206', '172.217.26.14', '172.217.31.174', '216.58.197.142'}
+#domain = 'github.com'   #github
 #domain = 'api.dialogflow.com'   #dialogflow api
 #domain = 'https://ssh.cloud.google.com/wc/channel?gsessionid=XtpixrlBZVJMxzOJ1IzL3thQA77S8XNP&VER=8&RID=rpc&SID=hmhyNaI1LM3KbMfBOjhzgw&CI=0&AID=0&TYPE=xmlhttp&zx=u46i8gu6zsgv&t=2'
 # domain = 'conda.anaconda.org'
