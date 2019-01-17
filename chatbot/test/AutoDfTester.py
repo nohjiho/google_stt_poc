@@ -1,3 +1,9 @@
+"""
+install package
+easy_install --upgrade google-cloud-bigquery
+easy_install --upgrade dialogflow
+"""
+
 import uuid
 #import dialogflow_v2 as dialogflow
 import dialogflow_v2beta1 as dialogflow
@@ -15,7 +21,7 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
     session_client = dialogflow.SessionsClient()
 
     session = session_client.session_path(project_id, session_id)
-    print('Session path: {}\n'.format(session))
+    print('Session path: {}/n'.format(session))
 
     for text in texts:
         text_input = dialogflow.types.TextInput(
@@ -67,19 +73,25 @@ def detect_intent_texts(project_id, session_id, texts, language_code):
     return return_list
 
 if __name__ == '__main__':
+    # local file path
+    #file_path = 'C:/Users/웰컴저축은행/workspace/google_stt_poc/chatbot/test/test_file/'
     file_path = 'C:/df/testfile/'
-    #file_name_list = ['테스트케이스1.txt','테스트케이스2.txt', '테스트케이스3.txt', '테스트케이스4.txt']
+    # server file path
+    #file_path = '/home/welcomesbdlab/google_stt_poc/chatbot/test/test_file/'
+    file_name_list = ['테스트케이스1.txt','테스트케이스2.txt', '테스트케이스3.txt', '테스트케이스4.txt']
     #file_name_list = ['테스트케이스2.txt']
-    file_name_list = ['test.txt']
+    #file_name_list = ['test.txt']
 
     for file_name in file_name_list:
         file_full_path = file_path + file_name
 
         print('============ ' + file_full_path + ' processing start!! ============')
+        #with open(file_full_path, encoding='utf-8') as f:
         with open(file_full_path) as f:
             lines = f.readlines()
 
-            return_list = detect_intent_texts('ml-lab-207601', uuid, lines, 'ko-KR')
+            print('uuid : ', uuid.UUID)
+            return_list = detect_intent_texts('ml-lab-207601', uuid.UUID, lines, 'ko-KR')
 
             #응답 메시지에서 주요한 정보들을 BigQuery에 저장.
             print(len(return_list))
